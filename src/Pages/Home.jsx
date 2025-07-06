@@ -1,18 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Header from '../component/Header'
 import AddTask from '../component/AddTask'
 import TaskList from '../component/TaskList';
 
 const Home = () => {
-    const dummyTasks = ["learn react" , "go gym" , "do js"];
-  return (
-    <div className='container'>
-        <Header />
-        <AddTask />
-        <TaskList tasks={dummyTasks} />
+    const [tasks, setTasks] = useState([]);
 
-    </div>
-  )
+    const addTask = (newTask) => {
+        if (newTask.trim() === '') return;
+        setTasks([...tasks, newTask]);
+    }
+
+    const deleteTask = (index) => {
+        const updateTask = tasks.filter((task, id) => id !== index);
+        setTasks(updateTask);
+    }
+
+    return (
+        <div className='container'>
+            <Header />
+            <AddTask addTask={addTask} />
+            <TaskList tasks={tasks} deleteTask={deleteTask} />
+        </div>
+    )
 }
 
-export default Home
+export default Home;

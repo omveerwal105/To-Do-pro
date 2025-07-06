@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const AddTask = () => {
+const AddTask = ({addTask}) => {
   const [task, setTask] = useState('');
 
   const handleSubmit = (e) => {
@@ -10,6 +10,9 @@ const AddTask = () => {
       alert('Please fill the required field');
       return;
     }
+
+    addTask(task);
+
 
     console.log('Task Added:', task);
     setTask(''); 
@@ -27,7 +30,7 @@ const AddTask = () => {
             value={task}
             onChange={(e) => setTask(e.target.value)}
           />
-          <button className='btn btn-primary' type='submit'>
+          <button className='btn btn-primary' type='submit' >
             Add Task
           </button>
         </div>
