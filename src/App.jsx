@@ -1,11 +1,15 @@
 import React from 'react'
-import Home from './Pages/Home'
+import AddTask from './component/AddTask'
+import { TodoProvider } from './context/TodoContext'
+
 
 
 const App = () => {
   return (
     <div>
-     <Home />
+      <TodoProvider>
+     <AddTask />
+     </TodoProvider>
     </div>
   )
 }

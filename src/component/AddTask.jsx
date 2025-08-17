@@ -1,40 +1,90 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from "react";
+import { TodoContext } from "../context/TodoContext";
+import TaskItem from "./TaskItem";
 
-const AddTask = ({addTask}) => {
-  const [task, setTask] = useState('');
+const AddTask = () => {
+  const { state, dispatch } = useContext(TodoContext);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const [taskName, setTaskName] = useState("");
+  const [editId, setEditId] = useState(null);
 
-    if (task.trim() === '') {
-      alert('Please fill the required field');
+  const handleAdd = () => {
+    if (!taskName.trim()) {
+      alert("Enter the task");
       return;
     }
-
-    addTask(task);
-
-
-    console.log('Task Added:', task);
-    setTask(''); 
+    if (editId !== null) {
+      dispatch({
+        type: "EDIT",
+        payload: { id: editId, text: taskName },
+      });
+      setEditId(null);
+    } else {
+      dispatch({
+        type: "ADD",
+        payload: taskName,
+      });
+    }
+    setTaskName("");
+  };
+  const handleEdit = (task) => {
+    setEditId(task.id);
+    setTaskName(task.text);
   };
 
   return (
-    <div className='container'>
-      <h2 className='fw-bold text-center'>Add Your Tasks</h2>
-      <form onSubmit={handleSubmit}>
-        <div className='card p-3 d-flex flex-column flex-md-row gap-3 align-items-center'>
-          <input
-            className='form-control'
-            type='text'
-            placeholder='Enter your task'
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-          />
-          <button className='btn btn-primary' type='submit' >
-            Add Task
-          </button>
-        </div>
-      </form>
+    <div className="container p-4">
+      <h4 className="text-center ">Todo Tasks</h4>
+      <div className="d-flex justify-content-center mt-3">
+        <input
+          className="form-control w-50"
+          placeholder="Enter the task..."
+          value={taskName}
+          onChange={(e) => setTaskName(e.target.value)}
+        />
+        <button
+          className={`ms-2 btn ${editId ? "btn-success" : "btn-primary"}`}
+          onClick={handleAdd}
+        >
+          {editId ? "Update" : "Add"}
+        </button>
+      </div>
+
+      <div className="d-flex justify-content-center gap-3 mt-4">
+        <button
+          className={`btn btn-sm ${
+            state.filter === "All" ? "btn-primary" : "btn-outline-primary"
+          }`}
+          onClick={() => dispatch({ type: "FILTER", payload: "All" })}
+        >
+          All
+        </button>
+        <button
+          className={`btn btn-sm ${
+            state.filter === "Completed" ? "btn-success" : "btn-outline-success"
+          }`}
+          onClick={() => dispatch({ type: "FILTER", payload: "Completed" })}
+        >
+          Completed
+        </button>
+        <button
+          className={`btn btn-sm ${
+            state.filter === "Pending" ? "btn-warning" : "btn-outline-warning"
+          }`}
+          onClick={() => dispatch({ type: "FILTER", payload: "Pending" })}
+        >
+          Pending
+        </button>
+
+        <button
+          className="btn btn-outline-danger btn-sm"
+          onClick={() => dispatch({ type: "CLEAR_COMPLETED" })}
+        >
+          Clear Completed
+        </button>
+      </div>
+
+      <TaskItem onEdit={handleEdit} />
     </div>
   );
 };
