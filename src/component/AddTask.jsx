@@ -1,12 +1,34 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TodoContext } from "../context/TodoContext";
 import TaskItem from "./TaskItem";
+import SpeechRecognition , {useSpeechRecognition } from 'react-speech-recognition'
 
 const AddTask = () => {
   const { state, dispatch } = useContext(TodoContext);
 
   const [taskName, setTaskName] = useState("");
   const [editId, setEditId] = useState(null);
+
+  const {
+    transcript, 
+    listening,  
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  useEffect(()=>{
+    if(transcript){
+      setTaskName(transcript);
+    }
+  },[transcript]);
+
+   useEffect(() => {
+    if (!listening && transcript.trim() !== "") {
+      handleAdd();
+    }
+  
+  }, [listening]);
+
 
   const handleAdd = () => {
     if (!taskName.trim()) {
@@ -26,11 +48,16 @@ const AddTask = () => {
       });
     }
     setTaskName("");
+    resetTranscript();
   };
   const handleEdit = (task) => {
     setEditId(task.id);
     setTaskName(task.text);
   };
+
+  if(!browserSupportsSpeechRecognition){
+    return <p>Your browser does not support Speech Recognition ❌</p>;
+  }
 
   return (
     <div className="container p-4">
@@ -48,6 +75,18 @@ const AddTask = () => {
         >
           {editId ? "Update" : "Add"}
         </button>
+
+        {listening ? (
+          <button className="me-2 btn btn-danger"
+          onClick={SpeechRecognition.stopListening} >
+              Stop 🎤
+          </button>
+        ) : (
+          <button className="ms-2 btn btn-secondary"
+          onClick={()=>SpeechRecognition.startListening({continuous : true})}>
+             Start 🎤
+          </button>
+        )}
       </div>
 
       <div className="d-flex justify-content-center gap-3 mt-4">
